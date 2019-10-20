@@ -8,7 +8,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 
-import com.just.agentweb.AgentWeb;
+import com.just.agentwebX5.AgentWebX5;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -46,7 +46,8 @@ public class ShareArticleActivity extends BaseActivity<ShareArticlePresenter> im
     EditText et_title;
     @BindView(R.id.et_link)
     EditText et_link;
-    private AgentWeb mAgentWeb;
+
+    private AgentWebX5 mAgentWeb;
 
     public static void start(Context context) {
         start(context, "");
@@ -175,8 +176,8 @@ public class ShareArticleActivity extends BaseActivity<ShareArticlePresenter> im
                 }
             });
         } else {
-            mAgentWeb.getWebCreator().getWebView().stopLoading();
-            mAgentWeb.getWebCreator().getWebView().loadUrl(url);
+            mAgentWeb.getWebCreator().get().stopLoading();
+            mAgentWeb.getWebCreator().get().loadUrl(url);
         }
     }
 

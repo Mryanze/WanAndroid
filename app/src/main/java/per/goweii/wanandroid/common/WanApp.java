@@ -10,12 +10,14 @@ import com.franmontiel.persistentcookiejar.PersistentCookieJar;
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
 import com.tencent.bugly.crashreport.CrashReport;
+import com.tencent.smtt.sdk.QbSdk;
 
 import cat.ereza.customactivityoncrash.config.CaocConfig;
 import io.realm.Realm;
 import per.goweii.basic.core.CoreInit;
 import per.goweii.basic.core.base.BaseApp;
 import per.goweii.basic.utils.DebugUtils;
+import per.goweii.basic.utils.LogUtils;
 import per.goweii.basic.utils.listener.SimpleCallback;
 import per.goweii.burred.Blurred;
 import per.goweii.rxhttp.core.RxHttp;
@@ -36,31 +38,53 @@ import per.goweii.wanandroid.utils.UserUtils;
  */
 public class WanApp extends BaseApp {
 
+    private static final String TAG = WanApp.class.getSimpleName();
+
     private static PersistentCookieJar mCookieJar = null;
 
     private static boolean mWebActivityStarted = false;
 
-    public static boolean isWebActivityStarted() {
-        return mWebActivityStarted;
-    }
-
     @Override
     public void onCreate() {
         super.onCreate();
-        setDarkModeStatus();
+        if (isMainProcess()) {
+            setDarkModeStatus();
+            RxHttp.init(this);
+            RxHttp.initRequest(new RxHttpRequestSetting(getCookieJar()));
+            WanCache.init();
+            Blurred.init(getAppContext());
+            CoreInit.getInstance().setOnGoLoginCallback(new SimpleCallback<Activity>() {
+                @Override
+                public void onResult(Activity data) {
+                    UserUtils.getInstance().doIfLogin(data);
+                }
+            });
+            Realm.init(this);
+            QbSdk.preInit(this, new QbSdk.PreInitCallback() {
+                @Override
+                public void onCoreInitFinished() {
+                    LogUtils.d(TAG, "preInit->onCoreInitFinished");
+                }
+
+                @Override
+                public void onViewInitFinished(boolean b) {
+                    LogUtils.d(TAG, "preInit->onViewInitFinished=" + b);
+                }
+            });
+            QbSdk.initX5Environment(this, new QbSdk.PreInitCallback() {
+                @Override
+                public void onCoreInitFinished() {
+                    LogUtils.d(TAG, "initX5Environment->onCoreInitFinished");
+                }
+
+                @Override
+                public void onViewInitFinished(boolean b) {
+                    LogUtils.d(TAG, "initX5Environment->onViewInitFinished=" + b);
+                }
+            });
+        }
         initBugly();
         initCrashActivity();
-        RxHttp.init(this);
-        RxHttp.initRequest(new RxHttpRequestSetting(getCookieJar()));
-        WanCache.init();
-        Blurred.init(getAppContext());
-        CoreInit.getInstance().setOnGoLoginCallback(new SimpleCallback<Activity>() {
-            @Override
-            public void onResult(Activity data) {
-                UserUtils.getInstance().doIfLogin(data);
-            }
-        });
-        Realm.init(this);
     }
 
     private void initBugly() {

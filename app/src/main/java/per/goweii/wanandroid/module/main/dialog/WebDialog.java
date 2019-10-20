@@ -10,7 +10,7 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 
-import com.just.agentweb.AgentWeb;
+import com.just.agentwebX5.AgentWebX5;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -153,7 +153,7 @@ public class WebDialog extends DialogLayer implements WebDialogView {
                 @Override
                 public void onClick2(View v) {
                     if (mAdapter != null) {
-                        AgentWeb agentWeb = mAdapter.getAgentWeb(vp.getCurrentItem());
+                        AgentWebX5 agentWeb = mAdapter.getAgentWeb(vp.getCurrentItem());
                         if (agentWeb != null) {
                             agentWeb.back();
                         }

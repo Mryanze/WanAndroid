@@ -1,12 +1,12 @@
 ext {
     android = [
-            applicationId        : "per.goweii.wanandroid",
-            compileSdkVersion    : 28,
-            minSdkVersion        : 19,
-            targetSdkVersion     : 28,
-            buildToolsVersion    : "28.0.3",
-            versionCode          : 27,
-            versionName          : "1.2.4",
+            applicationId    : "per.goweii.wanandroid",
+            compileSdkVersion: 28,
+            minSdkVersion    : 19,
+            targetSdkVersion : 28,
+            buildToolsVersion: "28.0.3",
+            versionCode      : 27,
+            versionName      : "1.2.4",
     ]
 
     compileOptions = [
@@ -42,6 +42,8 @@ ext {
             materialProgressBar   : "1.4.2",
             realtimeBlurView      : "1.1.2",
             agentWeb              : "4.0.0",
+            agentWebX5            : "2.0.0",
+            tbsX5                 : "43697",
             banner                : "1.4.10",
             persistentCookieJar   : "v1.0.1",
             revealLayout          : "1.2.1",
@@ -98,6 +100,8 @@ ext {
             materialProgressBar    : "me.zhanghai.android.materialprogressbar:library:$versions.materialProgressBar",
             realtimeBlurView       : "com.github.mmin18:realtimeblurview:$versions.realtimeBlurView",
             agentWeb               : "com.just.agentweb:agentweb:$versions.agentWeb",
+            agentWebX5             : "com.just.agentwebX5:agentwebX5:$versions.agentWebX5",
+            tbsX5                  : "com.tencent.tbs.tbssdk:sdk:$versions.tbsX5",
             banner                 : "com.youth.banner:banner:$versions.banner",
             persistentCookieJar    : "com.github.franmontiel:PersistentCookieJar:$versions.persistentCookieJar",
             revealLayout           : "com.github.goweii:RevealLayout:$versions.revealLayout",

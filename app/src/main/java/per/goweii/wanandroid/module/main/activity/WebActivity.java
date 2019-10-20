@@ -13,7 +13,7 @@ import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 
-import com.just.agentweb.AgentWeb;
+import com.just.agentwebX5.AgentWebX5;
 
 import butterknife.BindView;
 import per.goweii.actionbarex.common.ActionBarSearch;
@@ -67,7 +67,7 @@ public class WebActivity extends BaseActivity<WebPresenter> implements per.gowei
     private String mCurrTitle = "";
     private String mCurrUrl = "";
 
-    private AgentWeb mAgentWeb = null;
+    private AgentWebX5 mAgentWeb = null;
     private RealmHelper mRealmHelper = null;
     private WebGuideDialog mWebGuideDialog = null;
 
@@ -182,8 +182,8 @@ public class WebActivity extends BaseActivity<WebPresenter> implements per.gowei
         iv_back.setOnClickListener(new OnClickListener2() {
             @Override
             public void onClick2(View v) {
-                if (mAgentWeb.getWebCreator().getWebView().canGoBack()) {
-                    mAgentWeb.getWebCreator().getWebView().goBack();
+                if (mAgentWeb.getWebCreator().get().canGoBack()) {
+                    mAgentWeb.getWebCreator().get().goBack();
                 } else {
                     finish();
                 }
@@ -192,8 +192,8 @@ public class WebActivity extends BaseActivity<WebPresenter> implements per.gowei
         iv_forward.setOnClickListener(new OnClickListener2() {
             @Override
             public void onClick2(View v) {
-                if (mAgentWeb.getWebCreator().getWebView().canGoForward()) {
-                    mAgentWeb.getWebCreator().getWebView().goForward();
+                if (mAgentWeb.getWebCreator().get().canGoForward()) {
+                    mAgentWeb.getWebCreator().get().goForward();
                 }
             }
         });
@@ -201,9 +201,9 @@ public class WebActivity extends BaseActivity<WebPresenter> implements per.gowei
             @Override
             public void onClick2(View v) {
                 if (iv_refresh.getAnimation() == null) {
-                    mAgentWeb.getWebCreator().getWebView().reload();
+                    mAgentWeb.getWebCreator().get().reload();
                 } else {
-                    mAgentWeb.getWebCreator().getWebView().stopLoading();
+                    mAgentWeb.getWebCreator().get().stopLoading();
                 }
             }
         });
@@ -212,13 +212,13 @@ public class WebActivity extends BaseActivity<WebPresenter> implements per.gowei
             public void onClick2(View v) {
                 int step = 0;
                 while (true) {
-                    if (mAgentWeb.getWebCreator().getWebView().canGoBackOrForward(step - 1)) {
+                    if (mAgentWeb.getWebCreator().get().canGoBackOrForward(step - 1)) {
                         step--;
                     } else {
                         break;
                     }
                 }
-                mAgentWeb.getWebCreator().getWebView().goBackOrForward(step);
+                mAgentWeb.getWebCreator().get().goBackOrForward(step);
             }
         });
         wc.setOnTouchDownListener(new WebContainer.OnTouchDownListener() {
@@ -240,7 +240,7 @@ public class WebActivity extends BaseActivity<WebPresenter> implements per.gowei
                 if (!TextUtils.isEmpty(url)) {
                     Uri uri = Uri.parse(url);
                     if (TextUtils.equals(uri.getScheme(), "http") || TextUtils.equals(uri.getScheme(), "https")) {
-                        mAgentWeb.getWebCreator().getWebView().loadUrl(url);
+                        mAgentWeb.getWebCreator().get().loadUrl(url);
                     }
                 }
                 abs.getEditTextView().clearFocus();
@@ -288,13 +288,13 @@ public class WebActivity extends BaseActivity<WebPresenter> implements per.gowei
 
             @Override
             public void onHistoryUpdate(boolean isReload) {
-                if (mAgentWeb.getWebCreator().getWebView().canGoBack()) {
+                if (mAgentWeb.getWebCreator().get().canGoBack()) {
                     iv_back.setImageResource(R.drawable.ic_back);
                 } else {
                     iv_back.setImageResource(R.drawable.ic_close);
                 }
-                switchIconEnable(iv_forward, mAgentWeb.getWebCreator().getWebView().canGoForward());
-                switchIconEnable(iv_home, mAgentWeb.getWebCreator().getWebView().canGoBack());
+                switchIconEnable(iv_forward, mAgentWeb.getWebCreator().get().canGoForward());
+                switchIconEnable(iv_home, mAgentWeb.getWebCreator().get().canGoBack());
             }
 
             @Override

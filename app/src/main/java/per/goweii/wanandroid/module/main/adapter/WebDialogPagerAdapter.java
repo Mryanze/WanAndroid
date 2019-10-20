@@ -8,7 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.just.agentweb.AgentWeb;
+import com.just.agentwebX5.AgentWebX5;
 
 import java.util.List;
 
@@ -29,7 +29,7 @@ public class WebDialogPagerAdapter extends PagerAdapter {
     private final Activity mActivity;
     private final List<ArticleBean> mTopUrls;
     private final List<ArticleBean> mUrls;
-    private final SparseArray<AgentWeb> mAgentWebs = new SparseArray<>();
+    private final SparseArray<AgentWebX5> mAgentWebs = new SparseArray<>();
 
     private OnDoubleClickListener mOnDoubleClickListener = null;
 
@@ -43,14 +43,14 @@ public class WebDialogPagerAdapter extends PagerAdapter {
         mOnDoubleClickListener = onDoubleClickListener;
     }
 
-    public AgentWeb getAgentWeb(int pos) {
+    public AgentWebX5 getAgentWeb(int pos) {
         return mAgentWebs.get(pos);
     }
 
     public void resumeAndPauseOthersAgentWeb(int pos) {
         for (int i = 0; i < mAgentWebs.size(); i++) {
             int index = mAgentWebs.keyAt(i);
-            AgentWeb agentWeb = mAgentWebs.valueAt(i);
+            AgentWebX5 agentWeb = mAgentWebs.valueAt(i);
             if (agentWeb == null) {
                 continue;
             }
@@ -64,7 +64,7 @@ public class WebDialogPagerAdapter extends PagerAdapter {
 
     public void pauseAllAgentWeb() {
         for (int i = 0; i < mAgentWebs.size(); i++) {
-            AgentWeb agentWeb = mAgentWebs.valueAt(i);
+            AgentWebX5 agentWeb = mAgentWebs.valueAt(i);
             if (agentWeb == null) {
                 continue;
             }
@@ -74,7 +74,7 @@ public class WebDialogPagerAdapter extends PagerAdapter {
 
     public void destroyAllAgentWeb() {
         for (int i = 0; i < mAgentWebs.size(); i++) {
-            AgentWeb agentWeb = mAgentWebs.valueAt(i);
+            AgentWebX5 agentWeb = mAgentWebs.valueAt(i);
             if (agentWeb != null) {
                 agentWeb.getWebLifeCycle().onDestroy();
             }
@@ -115,7 +115,7 @@ public class WebDialogPagerAdapter extends PagerAdapter {
                 }
             }
         });
-        AgentWeb agentWeb = AgentWebCreator.create(mActivity, wc, data.getLink());
+        AgentWebX5 agentWeb = AgentWebCreator.create(mActivity, wc, data.getLink());
         rootView.setTag(agentWeb);
         mAgentWebs.put(position, agentWeb);
         container.addView(rootView);
@@ -127,8 +127,8 @@ public class WebDialogPagerAdapter extends PagerAdapter {
         mAgentWebs.remove(position);
         View rootView = (View) object;
         Object tag = rootView.getTag();
-        if (tag instanceof AgentWeb) {
-            AgentWeb agentWeb = (AgentWeb) tag;
+        if (tag instanceof AgentWebX5) {
+            AgentWebX5 agentWeb = (AgentWebX5) tag;
             agentWeb.getWebLifeCycle().onDestroy();
             rootView.setTag(null);
         }

@@ -3,24 +3,25 @@ package per.goweii.wanandroid.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.PixelFormat;
 import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import android.webkit.CookieManager;
-import android.webkit.CookieSyncManager;
-import android.webkit.WebChromeClient;
-import android.webkit.WebResourceRequest;
-import android.webkit.WebResourceResponse;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 
-import com.just.agentweb.AgentWeb;
-import com.just.agentweb.DefaultWebClient;
+import com.just.agentwebX5.AgentWebX5;
+import com.just.agentwebX5.DefaultWebClient;
+import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
+import com.tencent.smtt.export.external.interfaces.WebResourceResponse;
+import com.tencent.smtt.sdk.CookieManager;
+import com.tencent.smtt.sdk.CookieSyncManager;
+import com.tencent.smtt.sdk.WebChromeClient;
+import com.tencent.smtt.sdk.WebSettings;
+import com.tencent.smtt.sdk.WebView;
+import com.tencent.smtt.sdk.WebViewClient;
 
 import java.util.List;
 
@@ -41,36 +42,38 @@ import per.goweii.wanandroid.widget.WebContainer;
  */
 public class AgentWebCreator {
 
-    public static AgentWeb create(Activity activity,
-                                  WebContainer container,
-                                  String url,
-                                  final ClientCallback clientCallback) {
-        AgentWeb agentWeb = AgentWeb.with(activity)
+    public static AgentWebX5 create(Activity activity,
+                                    WebContainer container,
+                                    String url,
+                                    final ClientCallback clientCallback) {
+        activity.getWindow().setFormat(PixelFormat.TRANSLUCENT);
+        AgentWebX5 agentWeb = AgentWebX5.with(activity)
                 .setAgentWebParent(container, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
-                .useDefaultIndicator(ResUtils.getColor(activity, R.color.assist), 1)
-                .interceptUnkownUrl()
-                .setSecurityType(AgentWeb.SecurityType.STRICT_CHECK)
-                .setMainFrameErrorView(R.layout.layout_agent_web_error, R.id.iv_404)
+                .useDefaultIndicator()
+                .setIndicatorColorWithHeight(ResUtils.getColor(activity, R.color.assist), 1)
+                .interceptUnkownScheme()
+                .setSecutityType(AgentWebX5.SecurityType.strict)
                 .setOpenOtherPageWays(DefaultWebClient.OpenOtherPageWays.DISALLOW)
-                .setWebChromeClient(new AgentWebChromeClient(clientCallback))
-                .setWebViewClient(new AgentWebViewClient(clientCallback))
-                .setWebView(inflateWebView(activity))
+                .setWebChromeClient(new AgentWebX5ChromeClient(clientCallback))
+                .setWebViewClient(new AgentWebX5ViewClient(clientCallback))
+                //.setWebView(inflateWebView(activity))
                 .createAgentWeb()
                 .ready()
                 .go(url);
-        agentWeb.getWebCreator().getWebView().setOverScrollMode(WebView.OVER_SCROLL_NEVER);
-        agentWeb.getWebCreator().getWebView().getSettings().setJavaScriptEnabled(false);
-        agentWeb.getWebCreator().getWebView().getSettings().setLoadsImagesAutomatically(true);
-        agentWeb.getWebCreator().getWebView().getSettings().setUseWideViewPort(true);
-        agentWeb.getWebCreator().getWebView().getSettings().setLoadWithOverviewMode(true);
-        agentWeb.getWebCreator().getWebView().getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
+        agentWeb.getWebCreator().get().setOverScrollMode(WebView.OVER_SCROLL_NEVER);
+        agentWeb.getWebCreator().get().getSettings().setJavaScriptEnabled(false);
+        agentWeb.getWebCreator().get().getSettings().setBlockNetworkImage(false);
+        agentWeb.getWebCreator().get().getSettings().setLoadsImagesAutomatically(true);
+        agentWeb.getWebCreator().get().getSettings().setUseWideViewPort(true);
+        agentWeb.getWebCreator().get().getSettings().setLoadWithOverviewMode(true);
+        agentWeb.getWebCreator().get().getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            CookieManager.getInstance().setAcceptThirdPartyCookies(agentWeb.getWebCreator().getWebView(), true);
+            CookieManager.getInstance().setAcceptThirdPartyCookies(agentWeb.getWebCreator().get(), true);
         }
         return agentWeb;
     }
 
-    public static AgentWeb create(Activity activity, WebContainer container, String url) {
+    public static AgentWebX5 create(Activity activity, WebContainer container, String url) {
         return create(activity, container, url, null);
     }
 
@@ -92,24 +95,12 @@ public class AgentWebCreator {
         }
         CookieManager cookieManager = CookieManager.getInstance();
         cookieManager.setAcceptCookie(true);
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            cookieManager.removeSessionCookie();
-            cookieManager.removeExpiredCookie();
-        } else {
-            cookieManager.removeSessionCookies(null);
+        for (Cookie cookie : cookies) {
+            cookieManager.setCookie(url, cookie.name() + "=" + cookie.value());
         }
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            for (Cookie cookie : cookies) {
-                cookieManager.setCookie(url, cookie.name() + "=" + cookie.value());
-            }
-            CookieSyncManager.createInstance(WanApp.getAppContext());
-            CookieSyncManager.getInstance().sync();
-        } else {
-            for (Cookie cookie : cookies) {
-                cookieManager.setCookie(url, cookie.name() + "=" + cookie.value());
-            }
-            cookieManager.flush();
-        }
+        cookieManager.flush();
+        CookieSyncManager.createInstance(WanApp.getAppContext());
+        CookieSyncManager.getInstance().sync();
     }
 
 
@@ -127,14 +118,14 @@ public class AgentWebCreator {
         void onPageFinished();
     }
 
-    public static class AgentWebChromeClient extends WebChromeClient {
+    public static class AgentWebX5ChromeClient extends WebChromeClient {
         private final ClientCallback mClientCallback;
 
-        public AgentWebChromeClient() {
+        public AgentWebX5ChromeClient() {
             mClientCallback = null;
         }
 
-        public AgentWebChromeClient(ClientCallback clientCallback) {
+        public AgentWebX5ChromeClient(ClientCallback clientCallback) {
             mClientCallback = clientCallback;
         }
 
@@ -155,20 +146,20 @@ public class AgentWebCreator {
         }
     }
 
-    public static class AgentWebViewClient extends WebViewClient {
+    public static class AgentWebX5ViewClient extends WebViewClient {
         private final ClientCallback mClientCallback;
 
-        public AgentWebViewClient() {
+        public AgentWebX5ViewClient() {
             mClientCallback = null;
         }
 
-        public AgentWebViewClient(ClientCallback clientCallback) {
+        public AgentWebX5ViewClient(ClientCallback clientCallback) {
             mClientCallback = clientCallback;
         }
 
         private boolean shouldInterceptRequest(Uri uri) {
             syncCookiesForWanAndroid(uri.toString());
-            LogUtils.d("AgentWebCreator", "interceptUrlRequest:" + uri.toString());
+            LogUtils.d("AgentWebX5Creator", "interceptUrlRequest:" + uri.toString());
             return false;
         }
 
@@ -177,7 +168,7 @@ public class AgentWebCreator {
          * false    加载
          */
         private boolean shouldOverrideUrlLoading(Uri uri) {
-            LogUtils.d("AgentWebCreator", "overrideUrlLoading:" + uri.toString());
+            LogUtils.d("AgentWebX5Creator", "overrideUrlLoading:" + uri.toString());
             switch (SettingUtils.getInstance().getUrlInterceptType()) {
                 default:
                 case HostInterceptUtils.TYPE_NOTHING:
